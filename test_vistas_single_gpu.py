@@ -1,7 +1,7 @@
 import argparse
 from functools import partial
 from os import path
-
+import time
 import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
@@ -179,8 +179,11 @@ def main():
         for batch_i, rec in enumerate(data_loader):
             print("Testing batch [{:3d}/{:3d}]".format(batch_i + 1, len(data_loader)))
 
+            start = time.time()
             img = rec["img"].cuda(non_blocking=True)
             probs, preds = model(img, scales, args.flip)
+            end = time.time()
+            print('time diff, pred:',end-start)
 
             for i, (prob, pred) in enumerate(zip(torch.unbind(probs, dim=0), torch.unbind(preds, dim=0))):
                 out_size = rec["meta"][i]["size"]
@@ -189,11 +192,12 @@ def main():
                 # Save prediction
                 prob = prob.cpu()
                 pred = pred.cpu()
-                pred_img = get_pred_image(pred, out_size, args.output_mode == "palette")
+                print(pred.shape)
+                pred_img = get_pred_image(pred, out_size, True)#args.output_mode == "palette")
                 pred_img.save(path.join(args.output, img_name + ".png"))
 
                 # Optionally save probabilities
-                if args.output_mode == "prob":
+                if True:#if args.output_mode == "prob":
                     prob_img = get_prob_image(prob, out_size)
                     prob_img.save(path.join(args.output, img_name + "_prob.png"))
 

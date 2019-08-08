@@ -18,7 +18,7 @@ class SegmentationDataset(Dataset):
 
         # Find all images
         self.images = []
-        for img_path in chain(*(glob.iglob(path.join(self.in_dir, ext)) for ext in SegmentationDataset._EXTENSIONS)):
+        for img_path in chain(*(sorted(glob.iglob(path.join(self.in_dir, ext))) for ext in SegmentationDataset._EXTENSIONS)):
             _, name_with_ext = path.split(img_path)
             idx, _ = path.splitext(name_with_ext)
             self.images.append({

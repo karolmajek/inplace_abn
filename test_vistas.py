@@ -2,7 +2,7 @@ import torch
 import sys
 import subprocess
 import argparse
-
+import time
 parser = argparse.ArgumentParser(description="Testing script for the Vistas segmentation model")
 parser.add_argument("--scales", metavar="LIST", type=str, default="[0.7, 1, 1.2]", help="List of scales")
 parser.add_argument("--flip", action="store_true", help="Use horizontal flipping")
@@ -41,6 +41,7 @@ def main():
     workers = []
 
     for i in range(world_size):
+      print('worker',i)
       if '--rank' in argslist:
         argslist[argslist.index('--rank')+1] = str(i)
       else:
@@ -50,9 +51,11 @@ def main():
       print(argslist)
       p = subprocess.Popen([str(sys.executable), 'test_vistas_single_gpu.py']+argslist, stdout=stdout)
       workers.append(p)
+      print('sleep 60')
+      time.sleep(60)
 
     for p in workers:
-      p.wait()   
+      p.wait()
 
 
 if __name__ == "__main__":
